@@ -28,6 +28,11 @@ following benefits:
 - helps WB developers to easily (relatively speaking) implement the new UI into
   the game
 
+## License
+
+Source code and assets used in this project is licensed under
+[CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/legalcode).
+
 [wb_invite]: https://discord.com/invite/warbrokers
 [proposal_discord]: https://discord.com/channels/324984733102768128/1183617242974396426/1183617242974396426
 [proposal_video]: https://youtube.com/watch?v=kuJRoOc95CA
