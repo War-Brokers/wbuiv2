@@ -1,0 +1,107 @@
+name: Deploy
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+env:
+  BUILD_PATH: deploy
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout (without LFS)
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{secrets.DEVELOPOMP_PAT}}
+
+      # Git LFS
+      - name: Create LFS file list
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+
+      - name: Restore LFS cache
+        uses: actions/cache@v2
+        id: lfs-cache
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
+
+      - name: Git LFS Pull
+        run: |
+          git lfs pull
+          git add .
+          git reset --hard
+
+      # Cache
+      - uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-
+
+      # Build
+      - run: mkdir $BUILD_PATH
+
+      - name: Build project
+        uses: game-ci/unity-builder@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: WebGL
+          buildsPath: $BUILD_PATH
+          allowDirtyBuild: true
+
+      # Output: Artifact
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: web
+          path: $BUILD_PATH
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal access token.
+          fetch-depth: 0 # otherwise, there would be errors pushing refs to the destination repository.
+
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web
+          path: .
+
+      - name: Move contents of web/ out to pwd
+        run: |
+          mv ./web/* .
+
+      - name: Deploy
+        run: |
+          # learn more about github action bot email address: https://github.com/orgs/community/discussions/26560#discussioncomment-3252339
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "chore: update demo"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.DEVELOPOMP_PAT }}
+          branch: gh-pages
