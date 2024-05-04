@@ -28,6 +28,8 @@ jobs:
         run: mkdir $BUILD_PATH
 
       - name: Build project
+        # ignore step failure
+        if: always()
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -44,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: web
-          path: $BUILD_PATH
+          path: $BUILD_PATH/WebGL
 
   deploy:
     name: Deploy
