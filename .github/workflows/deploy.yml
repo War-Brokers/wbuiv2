@@ -62,22 +62,17 @@ jobs:
           mv ./WebGL/index.html index.html
 
           rm -rf Build/
-          mkdir Build/
-          mv ./WebGL/Build/* Build/
+          mv ./WebGL/Build/ Build/
 
           rm -rf TemplateData/
-          mkdir TemplateData/
-          mv ./WebGL/TemplateData/* TemplateData/
-
-          rm -rf WebGL
+          mv ./WebGL/TemplateData/ TemplateData/
 
       - name: Deploy
         run: |
           # learn more about github action bot email address: https://github.com/orgs/community/discussions/26560#discussioncomment-3252339
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git status
-          git add Build TemplateData index.html
+          git add .
           git commit -m "chore: update demo"
 
       - name: Push changes
