@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WebGL
-          path: WebGL
+          path: build/WebGL
 
   deploy:
     name: Deploy
