@@ -18,34 +18,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository (without LFS)
+      - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          token: ${{secrets.DEVELOPOMP_PAT}}
-
-      - name: Create LFS file list
-        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-
-      - name: Restore LFS cache
-        uses: actions/cache@v2
-        id: lfs-cache
-        with:
-          path: .git/lfs
-          key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
-
-      - name: Git LFS Pull
-        run: |
-          git lfs pull
-          git add .
-          git reset --hard
-
-      - name: Cache
-        uses: actions/cache@v2
-        with:
-          path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-
+          lfs: true
 
       - name: Create build dir
         run: mkdir $BUILD_PATH
@@ -57,6 +33,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
+          customImage: "unityci/editor:ubuntu-2021.3.37f1-webgl-3"
           targetPlatform: WebGL
           buildsPath: $BUILD_PATH
           allowDirtyBuild: true
