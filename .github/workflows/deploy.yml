@@ -11,8 +11,6 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
-env:
-  BUILD_PATH: deploy
 jobs:
   build:
     name: Build
@@ -24,9 +22,6 @@ jobs:
           lfs: true
           token: ${{ secrets.DEVELOPOMP_PAT }}
 
-      - name: Create build dir
-        run: mkdir $BUILD_PATH
-
       - name: Build project
         continue-on-error: true
         uses: game-ci/unity-builder@v4
@@ -37,15 +32,13 @@ jobs:
         with:
           customImage: "unityci/editor:ubuntu-2021.3.37f1-webgl-3"
           targetPlatform: WebGL
-          buildsPath: $BUILD_PATH
-          allowDirtyBuild: true
 
       # Output: Artifact
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web
-          path: $BUILD_PATH/WebGL
+          name: WebGL
+          path: WebGL
 
   deploy:
     name: Deploy
@@ -62,7 +55,7 @@ jobs:
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
-          name: web
+          name: WebGL
           path: .
 
       - name: Move contents of web/ out to pwd
