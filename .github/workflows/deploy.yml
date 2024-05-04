@@ -66,8 +66,7 @@ jobs:
           path: .
 
       - name: Move contents of web/ out to pwd
-        run: |
-          mv ./web/* .
+        run: mv ./WebGL/* .
 
       - name: Deploy
         run: |
