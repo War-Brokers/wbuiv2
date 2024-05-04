@@ -58,6 +58,11 @@ jobs:
           name: WebGL
           path: .
 
+      - name: Show file structure
+        run: |
+          ls -lah .
+          ls -lah WebGL
+
       - name: Move contents of web/ out to pwd
         run: |
           mv ./WebGL/index.html index.html
