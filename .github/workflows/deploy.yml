@@ -18,13 +18,11 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      # Checkout (without LFS)
-      - name: Checkout repository
+      - name: Checkout repository (without LFS)
         uses: actions/checkout@v2
         with:
           token: ${{secrets.DEVELOPOMP_PAT}}
 
-      # Git LFS
       - name: Create LFS file list
         run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
 
@@ -41,16 +39,16 @@ jobs:
           git add .
           git reset --hard
 
-      # Cache
-      - uses: actions/cache@v2
+      - name: Cache
+        uses: actions/cache@v2
         with:
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-
 
-      # Build
-      - run: mkdir $BUILD_PATH
+      - name: Create build dir
+        run: mkdir $BUILD_PATH
 
       - name: Build project
         uses: game-ci/unity-builder@v2
