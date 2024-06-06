@@ -2,7 +2,6 @@
   "cSpell.words": ["Behaviour", "developomp", "Maxbros"],
 
   "editor.formatOnSave": true,
-  "dotnet.defaultSolution": "wbuiv2.sln",
 
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
